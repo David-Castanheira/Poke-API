@@ -30,7 +30,6 @@ Aí, você pode completar conforme a necessidade
 """
 site_pokeapi = "https://pokeapi.co"
 
-
 """
 1. Dado o número de um pokémon, qual é o nome dele?
 
@@ -55,8 +54,6 @@ em diante.
 class PokemonNaoExisteException(Exception):
     pass #nao faça nada aqui. Essa exception
          #já está pronta, só é um "nome" novo
-
-
 
 """
 2. Dado o nome de um pokémon, qual é o número dele?
@@ -117,8 +114,6 @@ dic_cores = { #esse dicionário pode te ajudar com o exercicio 4
     "black": "preto"
 }
 
-
-
 """
 4. Dado o nome ou número de um pokémon, qual é o nome da cor (em português) predominante dele?
 Os nomes de cores possíveis em português são "marrom", "amarelo", "azul", "rosa", "cinza", "roxo", "vermelho", "branco", "verde" e "preto".
@@ -137,6 +132,7 @@ seja útil.
 #     return cor_pt
 
 def cor_do_pokemon(nome):
+    nome = nome.lower()
     cor_ing = color_of_pokemon(nome)
     cor_pt = dic_cores[cor_ing]
     return cor_pt
@@ -176,9 +172,32 @@ Isso será verdade para todo o arquivo.
 def tipos_do_pokemon(nome):
     nome = nome.lower()
     url = f"http://pokeapi.co/api/v2/pokemon/{nome}/"
+    r = requests.get(url)
+    if r.status_code != 200:
+        raise PokemonNaoExisteException
+    dici = r.json()
+    tipo_listas = dici['types']
+    resposta = []  
+    for dicionario in tipo_listas:
+        tipo_ing = dicionario['type']['name']
+        tipo_pt = dic_tipos[tipo_ing]
+        resposta.append(tipo_pt)
+    return resposta
+
+
+# Código utilizando o range
+# def tipos_do_pokemon(nome):
+#     nome = nome.lower()
+#     url = f"http://pokeapi.co/api/v2/pokemon/{nome}/"
+#     r = requests.get(url)
+#     dici = r.json()
+#     tipo_listas = dici['types'][0]['type']['name']
+#     for i in range(0, 1):
+#         if i == 0:
+#             return tipo_listas
+#         elif i == 1:
+#             return tipo_listas
     
-
-
 """
 6. Dado o nome de um pokémon, liste de qual pokémon ele evoluiu.
 Por exemplo, evolucao_anterior('venusaur') == 'ivysaur'
@@ -235,8 +254,10 @@ site_treinador = "http://127.0.0.1:9000" #quando você estiver executando o
 #servidor do treinador, essa URL estará ativa
 
 def cadastrar_treinador(nome):
-    pass
-
+    r = requests.put(f"{site_treinador}/treinador/{nome}")
+    status_code = r.status_code
+    if status_code == 202: return True
+    if status_code == 303: return False
 
 
 #nao precisa mexer nas proximas excessões
